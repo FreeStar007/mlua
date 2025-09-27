@@ -77,12 +77,3 @@ Performance:
 
 Module source is read once during initialization
 Separate loops for functions/values optimize large modules
-
-This maintains pure Markdown format with:
-- Proper code blocks (triple backticks)
-- Consistent header levels
-- Clear section separation
-- Type annotations preserved
-- All implementation details from source
-- Practical usage examples
-- Important technical notes

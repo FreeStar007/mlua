@@ -17,15 +17,15 @@ class MLuaLoggerGenerator(MLuaLogger):
 
     @staticmethod
     def info(message, datetime_enabled=True, bright_text=False):
-        return f"{colorama.Style.BRIGHT if bright_text else ''}{colorama.Fore.GREEN}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S') if datetime_enabled else ""} INFO] {message}"
+        return f"{colorama.Style.BRIGHT if bright_text else ""}{colorama.Fore.GREEN}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S ') if datetime_enabled else ""}INFO] {message}"
 
     @staticmethod
     def warn(message, datetime_enabled=True, bright_text=False):
-        return f"{colorama.Style.BRIGHT if bright_text else ''}{colorama.Fore.YELLOW}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S') if datetime_enabled else ""} WARN] {message}"
+        return f"{colorama.Style.BRIGHT if bright_text else ""}{colorama.Fore.YELLOW}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S ') if datetime_enabled else ""}WARN] {message}"
 
     @staticmethod
     def error(message, datetime_enabled=True, bright_text=False):
-        return f"{colorama.Style.BRIGHT if bright_text else ''}{colorama.Fore.RED}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S') if datetime_enabled else ""} ERROR] {message}"
+        return f"{colorama.Style.BRIGHT if bright_text else ""}{colorama.Fore.RED}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S ') if datetime_enabled else ""}ERROR] {message}"
 
     def __str__(self):
         return f"{type(self).__name__}()"
@@ -33,16 +33,16 @@ class MLuaLoggerGenerator(MLuaLogger):
 class MLuaLoggerDisplayer(MLuaLogger):
 
     @staticmethod
-    def info(message):
-        print(MLuaLoggerGenerator.info(message))
+    def info(*args, **kwargs):
+        print(MLuaLoggerGenerator.info(*args, **kwargs))
 
     @staticmethod
-    def warn(message):
-        print(MLuaLoggerGenerator.warn(message))
+    def warn(*args, **kwargs):
+        print(MLuaLoggerGenerator.warn(*args, **kwargs))
 
     @staticmethod
-    def error(message):
-        print(MLuaLoggerGenerator.error(message))
+    def error(*args, **kwargs):
+        print(MLuaLoggerGenerator.error(*args, **kwargs))
 
     def __str__(self):
         return f"{type(self).__name__}()"
