@@ -1,79 +1,54 @@
-# MLuaCore Module Documentation
+# MLua 使用指南                                 
+## 概述
+MLua 是一个基于 Lua 的轻量级扩展库，提供了便捷的 Lua 环境管理和模块加载功能。                   
+## 快速开始
 
-## Overview
-Core module for Python-Lua interaction providing Lua environment management, module loading and installation capabilities.
+### 1. 创建 Lua 环境
+```python
+from mluaroot import MLuaEnvironment
+                                                # 创建 Lua 运行时环境
+lua_env = MLuaEnvironment()
+```
+                                                ### 2. 加载 Lua 模块
+```python
+from mluaroot import MLuaModule
+                                                # 加载单个 Lua 模块
+module = MLuaModule("path/to/module.lua")       
+# 挂载模块到环境                                mlua_obj = module.mount(lua_env)
+```                                             
+### 3. 使用模块功能
+```python
+# 调用模块函数                                  result = mlua_obj.functions.some_function()
 
-## Classes
+# 访问模块值
+value = mlua_obj.values.some_variable
+```
 
-### `MLuaObject`
-- **Purpose**: Container for loaded Lua functions and values
-- **Attributes**:
-  - `functions`: Stores Lua functions (`_Functions` class instance)
-  - `values`: Stores Lua non-function values (`_Values` class instance)
-- **Methods**:
-  - `__str__()`: Returns string representation of contained functions/values
+### 4. 处理模块依赖
+```python
+from mluaroot import MLuaModuleDependencies
 
-### `MLuaEnvironment` 
-- **Purpose**: Manages Lua runtime environment
-- **Methods**:
-  - `environment() -> LuaRuntime`: Returns the underlying Lua runtime
-  - `reset(*args, **kwargs)`: Reinitializes the Lua runtime
-  - `__str__()`: Returns environment description
+# 创建依赖管理器
+dep_resolver = MLuaModuleDependencies()
 
-### `MLuaModule`
-- **Purpose**: Loads and manages Lua modules
-- **Initialization**:
-  ```python
-  MLuaModule(module_path: str)
-DiffExpandCopyInsert
-Methods:
-mount(env: MLuaEnvironment, security=True) -> MLuaObject: Loads module into environment
-name() -> str: Gets module name (without extension)
-path() -> str: Gets source file path
-source() -> str: Gets raw module source code
-__str__(): Returns module identifier
-MLuaModuleInstaller
-Purpose: Batch installation of multiple Lua modules
-Initialization:
-MLuaModuleInstaller(*mlua_modules: MLuaModule)
-DiffCopyInsert
-Methods:
-mount_all(lua: MLuaEnvironment) -> list[MLuaObject]: Installs all modules
-__str__(): Returns installer description
-Usage Example
-# Initialize environment
-lua_env = MLuaEnvironment(unpack_returned_tuples=True)
+# 解析模块依赖
+modules_to_load = dep_resolver.resolve(module)
 
-# Load module
-module = MLuaModule("./scripts/utils.lua")
+# 批量加载模块
+installer = MLuaModulesInstaller(*modules_to_load)                                              mlua_objects = installer.mount_all(lua_env)
+```
+                                                ## 高级用法
 
-# Mount module (safe mode)
-result = module.mount(lua_env)
-print(result.values.config)  # Access exported values
-print(result.functions.calc)  # Access exported functions
+### 安全模式                                    ```python
+# 安全模式挂载（推荐）
+mlua_obj = module.mount(lua_env, security=True) 
+# 非安全模式挂载（更快但可能不安全）            mlua_obj = module.mount(lua_env, security=False)
+```
 
-# Batch installation
-installer = MLuaModuleInstaller(
-    MLuaModule("./mod1.lua"),
-    MLuaModule("./mod2.lua")
-)
-results = installer.mount_all(lua_env)
-DiffExpandCopyInsert
-Implementation Notes
-Security Mode:
-
-Enabled by default in mount()
-Uses setattr() for safer attribute assignment
-Disable for ~20% faster loading (no type checks)
-Path Handling:
-
-All paths are resolved via pathlib.Path
-Relative paths are resolved from working directory
-Type Conversion:
-
-Automatic Python-Lua type conversion via Lupa
-Functions are wrapped as callable objects
-Performance:
-
-Module source is read once during initialization
-Separate loops for functions/values optimize large modules
+### 深度加载模块
+```python
+# 自动加载模块及其所有依赖
+mlua_objects = module.mount_deeply(lua_env, dep_resolver)                                       ```
+                                                ## 注意事项
+1. 建议始终使用安全模式挂载模块                 2. 模块依赖关系应避免循环依赖
+3. 模块文件路径应为绝对路径或相对于工作目录的有 效路
