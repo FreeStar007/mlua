@@ -9,20 +9,20 @@ __all__ = ["MLuaModuleManager"]
 class MLuaModuleManager(MLuaBase):
 
     @staticmethod
-    def save(*mlua_modules: MLuaModule, directory="./mlua_modules") -> None:
+    def save(*modules: MLuaModule, directory="./modules") -> None:
         try:
             mkdir(directory)
         except FileExistsError:
             pass
 
         configuration = {}
-        for module in mlua_modules:
+        for module in modules:
             configuration[module.name()] = module.path()
 
         Path(directory, "index.json").write_text(dumps(configuration))
 
     @staticmethod
-    def load(directory="./mlua_modules") -> list[MLuaModule]:
+    def load(directory="./modules") -> list[MLuaModule]:
         configuration = loads(Path(directory, "index.json").read_text())
         temp_modules = []
         for module_name, module_path in configuration.items():
