@@ -13,8 +13,8 @@ def requirements() -> None:
 
 @MLuaLoggerDecorator.info("Testing module.")
 @MLuaLoggerDecorator.timer()
-def test(module_path: str) -> None:
+def test(path: str) -> None:
     lua = MLuaEnvironment()
-    module = MLuaModule(module_path)
+    module = MLuaModule(path)
     result = module.mount(lua)
     print(result)
