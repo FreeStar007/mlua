@@ -67,12 +67,12 @@ class MLuaModule(MLuaBase):
                 
         return mlua_object
 
-    def mount_deeply(self, environment: MLuaEnvironment) -> list[MLuaObject]:
-        modules_installer = MLuaModulesInstaller(*MLuaModuleDependencies.resolve(self))
-        return modules_installer.mount_all(environment)
+    def mount_deeply(self, environment: MLuaEnvironment, dependencies: "MLuaModuleDependencies", security=True) -> list[MLuaObject]:
+        modules_installer = MLuaModulesInstaller(*dependencies.resolve(self))
+        return modules_installer.mount_all(environment, security=security)
 
-    def dependence(self, *mlua_modules: "MLuaModule"):
-        self._dependencies[self._name].extend(mlua_modules)
+    def dependence(self, *modules: "MLuaModule"):
+        self._dependencies[self._name].extend(modules)
         
     def dependencies(self):
         return self._dependencies[self._name]
@@ -94,10 +94,10 @@ class MLuaModulesInstaller(MLuaBase):
     def __init__(self, *modules: MLuaModule) -> None:
         self._modules = modules
 
-    def mount_all(self, environment: MLuaEnvironment) -> list[MLuaObject]:
+    def mount_all(self, environment: MLuaEnvironment, security=True) -> list[MLuaObject]:
         temp_modules = []
         for module in self._modules:
-            temp_modules.append(module.mount(environment))
+            temp_modules.append(module.mount(environment, security=security))
 
         return temp_modules
 
@@ -107,18 +107,18 @@ class MLuaModulesInstaller(MLuaBase):
 class MLuaModuleDependencies(MLuaBase):
 
     def __init__(self) -> None:
-        self._temp_results = set()
+        self._temp_results = []
     
-    def resolve(self, *modules: MLuaModule) -> set[Any]:
+    def resolve(self, *modules: MLuaModule) -> list[MLuaModule]:
         def run(*son_dependencies: MLuaModule) -> None:
             for dependency in son_dependencies:
                 dependencies: list[MLuaModule] = dependency.dependencies()
                 if dependencies:
                     run(*dependencies)
                     
-                self._temp_results.add(dependency)
+                self._temp_results.append(dependency)
                 
         run(*modules)
         result = self._temp_results
-        self._temp_results = set()
+        self._temp_results = []
         return result
