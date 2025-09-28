@@ -4,9 +4,9 @@ from json import loads, dumps
 from .mluacore import MLuaModule
 from ..base import MLuaBase
 
-__all__ = ["MLuaModuleManager"]
+__all__ = ["MLuaModulesManager"]
 
-class MLuaModuleManager(MLuaBase):
+class MLuaModulesManager(MLuaBase):
 
     @staticmethod
     def save(*modules: MLuaModule, directory="./modules") -> None:

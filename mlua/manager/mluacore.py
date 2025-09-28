@@ -4,7 +4,7 @@ from lupa import LuaRuntime, lua_type
 from pathlib import Path
 from ..base.mluaroot import MLuaBase
 
-__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaModulesInstaller", "MLuaModuleDependencies"]
+__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaModulesInstaller", "MLuaModulesDependencies"]
 
 class MLuaObject(MLuaBase):
 
@@ -104,19 +104,19 @@ class MLuaModulesInstaller(MLuaBase):
     def __str__(self) -> str:
         return f"{type(self).__name__}({', '.join([str(mlua_module) for mlua_module in self._modules])})"
         
-class MLuaModuleDependencies(MLuaBase):
+class MLuaModulesDependencies(MLuaBase):
 
     def __init__(self) -> None:
         self._temp_results = []
     
     def resolve(self, *modules: MLuaModule) -> list[MLuaModule]:
         def run(*son_dependencies: MLuaModule) -> None:
-            for dependency in son_dependencies:
-                dependencies: list[MLuaModule] = dependency.dependencies()
+            for son_dependency in son_dependencies:
+                dependencies: list[MLuaModule] = son_dependency.dependencies()
                 if dependencies:
                     run(*dependencies)
                     
-                self._temp_results.append(dependency)
+                self._temp_results.append(son_dependency)
                 
         run(*modules)
         result = self._temp_results
