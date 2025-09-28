@@ -21,7 +21,8 @@ from mluaroot import MLuaModule
 module = MLuaModule("path/to/module.lua")
 # 挂载模块到环境
 mlua_obj = module.mount(lua_env)
-```                                             
+```
+
 ### 3. 使用模块功能
 ```python
 # 调用模块函数
@@ -48,7 +49,7 @@ mlua_objects = installer.mount_all(lua_env)
 
 ## 高级用法
 
-### 安全模式                                
+### 安全模式
 
 ```python
 # 安全模式挂载（推荐）
@@ -64,6 +65,6 @@ mlua_objects = module.mount_deeply(lua_env, dep_resolver)
 ```
 
 ## 注意事项
-1. 建议始终使用安全模式挂载模块                 
+1. 建议始终使用安全模式挂载模块
 2. 模块依赖关系应避免循环依赖
 3. 模块文件路径应为绝对路径或相对于工作目录的有路径
