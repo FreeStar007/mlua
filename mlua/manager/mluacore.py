@@ -101,7 +101,7 @@ class MLuaModulesInstaller(MLuaBase):
 class MLuaModuleDependencies(MLuaBase):
 
     def __init__(self) -> None:
-        self._target_modules = []
+        self._target_modules: list[MLuaModule] = []
 
     def resolve(self, *mlua_modules: MLuaModule) -> None:
         for mlua_module in mlua_modules:
@@ -111,9 +111,5 @@ class MLuaModuleDependencies(MLuaBase):
 
             self._target_modules.append(mlua_module)
                 
-    def targets(self) -> list[MLuaModule]:
+    def results(self) -> list[MLuaModule]:
         return self._target_modules
-                
-    def install(self, mlua_environment: MLuaEnvironment) -> list[MLuaObject]:
-        mlua_modules_installer = MLuaModulesInstaller(*self._target_modules)
-        return mlua_modules_installer.mount_all(mlua_environment)
