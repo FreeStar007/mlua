@@ -1,3 +1,5 @@
+from typing import Set, Any
+
 from lupa import LuaRuntime, lua_type
 from pathlib import Path
 from ..base.mluaroot import MLuaBase
@@ -30,30 +32,30 @@ class MLuaEnvironment(MLuaBase):
         self.reset(*args, **kwargs)
 
     def environment(self) -> LuaRuntime:
-        return self._lua_runtime
+        return self._runtime
 
     def reset(self, *args, **kwargs) -> None:
-        self._lua_runtime = LuaRuntime(*args, **kwargs)
+        self._runtime = LuaRuntime(*args, **kwargs)
 
     def __str__(self):
-        return f"{type(self).__name__}({self._lua_runtime})"
+        return f"{type(self).__name__}({self._runtime})"
 
 class MLuaModule(MLuaBase):
 
-    def __init__(self, module_path: str) -> None:
-        self._module_path = module_path
-        self._module_data: str = Path(self._module_path).read_text()
-        self._module_name = self.name()
-        self._module_dependencies = {
-            self._module_name: []
+    def __init__(self, path: str) -> None:
+        self._path = Path(path)
+        self._name = self._path.stem
+        self._data: str = self._path.read_text()
+        self._dependencies = {
+            self._name: []
         }
 
-    def mount(self, mlua_environment: MLuaEnvironment, security=True) -> MLuaObject:
+    def mount(self, environment: MLuaEnvironment, security=True) -> MLuaObject:
         mlua_object = MLuaObject()
         functions = mlua_object.functions
         values = mlua_object.values
-        lua = mlua_environment.environment()
-        temp_modules: dict = lua.execute(self._module_data)
+        lua = environment.environment()
+        temp_modules: dict = lua.execute(self._data)
         # 两段循环意图为去除循环内判断的开销，遇到模块数据大的情况时有显著用处
         if security:
             for key, value in temp_modules.items():
@@ -65,56 +67,58 @@ class MLuaModule(MLuaBase):
                 
         return mlua_object
 
-    def mount_deeply(self, mlua_environment: MLuaEnvironment) -> MLuaObject:
-        mlua_module_dependencies = MLuaModuleDependencies()
-        mlua_module_dependencies.resolve(self)
-        return mlua_module_dependencies.results()[0].mount(mlua_environment)
+    def mount_deeply(self, environment: MLuaEnvironment) -> list[MLuaObject]:
+        modules_installer = MLuaModulesInstaller(*MLuaModuleDependencies.resolve(self))
+        return modules_installer.mount_all(environment)
 
     def dependence(self, *mlua_modules: "MLuaModule"):
-        self._module_dependencies[self._module_name].extend(mlua_modules)
+        self._dependencies[self._name].extend(mlua_modules)
         
     def dependencies(self):
-        return self._module_dependencies[self._module_name]
+        return self._dependencies[self._name]
 
     def name(self) -> str:
-        return Path(self._module_path).stem
+        return self._name
 
     def path(self) -> str:
-        return self._module_path
+        return str(self._path)
 
     def source(self) -> str:
-        return self._module_data
+        return self._data
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{type(self).__name__}({self.name()})"
 
 class MLuaModulesInstaller(MLuaBase):
 
-    def __init__(self, *mlua_modules: MLuaModule) -> None:
-        self._mlua_modules = mlua_modules
+    def __init__(self, *modules: MLuaModule) -> None:
+        self._modules = modules
 
-    def mount_all(self, mlua_environment: MLuaEnvironment) -> list[MLuaObject]:
-        temp_mlua_modules = []
-        for mlua_module in self._mlua_modules:
-            temp_mlua_modules.append(mlua_module.mount(mlua_environment))
+    def mount_all(self, environment: MLuaEnvironment) -> list[MLuaObject]:
+        temp_modules = []
+        for module in self._modules:
+            temp_modules.append(module.mount(environment))
 
-        return temp_mlua_modules
+        return temp_modules
 
-    def __str__(self):
-        return f"{type(self).__name__}({', '.join([str(mlua_module) for mlua_module in self._mlua_modules])})"
+    def __str__(self) -> str:
+        return f"{type(self).__name__}({', '.join([str(mlua_module) for mlua_module in self._modules])})"
         
 class MLuaModuleDependencies(MLuaBase):
 
     def __init__(self) -> None:
-        self._target_modules: list[MLuaModule] = []
-
-    def resolve(self, *mlua_modules: MLuaModule) -> None:
-        for mlua_module in mlua_modules:
-            dependencies: list[MLuaModule] = mlua_module.dependencies()
-            if dependencies:
-                self.resolve(*dependencies)
-
-            self._target_modules.append(mlua_module)
+        self._temp_results = set()
+    
+    def resolve(self, *modules: MLuaModule) -> set[Any]:
+        def run(*son_dependencies: MLuaModule) -> None:
+            for dependency in son_dependencies:
+                dependencies: list[MLuaModule] = dependency.dependencies()
+                if dependencies:
+                    run(*dependencies)
+                    
+                self._temp_results.add(dependency)
                 
-    def results(self) -> list[MLuaModule]:
-        return self._target_modules
+        run(*modules)
+        result = self._temp_results
+        self._temp_results = set()
+        return result
