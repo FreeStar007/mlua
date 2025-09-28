@@ -2,7 +2,7 @@ from .base import *
 from .manager import *
 from .logs import *
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __author__ = "FreeStar007"
 
 def info() -> None:
