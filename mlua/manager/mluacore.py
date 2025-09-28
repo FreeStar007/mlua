@@ -64,7 +64,12 @@ class MLuaModule(MLuaBase):
                 (functions if lua_type(value) == "function" else values).__dict__[key] = value
                 
         return mlua_object
-        
+
+    def mount_deeply(self, mlua_environment: MLuaEnvironment) -> MLuaObject:
+        mlua_module_dependencies = MLuaModuleDependencies()
+        mlua_module_dependencies.resolve(self)
+        return mlua_module_dependencies.results()[0].mount(mlua_environment)
+
     def dependence(self, *mlua_modules: "MLuaModule"):
         self._module_dependencies[self._module_name].extend(mlua_modules)
         
