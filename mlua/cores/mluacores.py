@@ -1,7 +1,5 @@
 __all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaModulesInstaller", "MLuaModulesDependencies"]
 
-from typing import Set, Any
-
 from lupa import LuaRuntime, lua_type
 from pathlib import Path
 from ..roots.mluaroots import MLuaBase
@@ -54,9 +52,14 @@ class MLuaModule(MLuaBase):
         mlua_object = MLuaObject()
         functions = mlua_object.functions
         values = mlua_object.values
-        lua = environment.environment()
+        lua: LuaRuntime = environment.environment()
         temp_modules: dict = lua.execute(self._data)
-        # 两段循环意图为去除循环内判断的开销，遇到模块数据大的情况时有显著用处
+        """
+        两段循环意图为去除循环内判断的开销，遇到模块数据大的情况时有显著用处
+        setattr有内置函数处理安全方面
+        __dict__访问更快
+        模块量少的情况下建议选择第一种方式，即security不需要改动
+        """
         if security:
             for key, value in temp_modules.items():
                 setattr(functions if lua_type(value) == "function" else values, key, value)

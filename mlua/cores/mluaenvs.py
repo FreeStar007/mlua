@@ -9,7 +9,7 @@ from ..roots import MLuaBase
 class MLuaModulesManager(MLuaBase):
 
     @staticmethod
-    def save(*modules: MLuaModule, directory="./modules") -> None:
+    def save(*modules: MLuaModule, directory="./mlua_modules") -> None:
         try:
             mkdir(directory)
         except FileExistsError:
@@ -22,7 +22,7 @@ class MLuaModulesManager(MLuaBase):
         Path(directory, "index.json").write_text(dumps(configuration))
 
     @staticmethod
-    def load(directory="./modules") -> list[MLuaModule]:
+    def load(directory="./mlua_modules") -> list[MLuaModule]:
         configuration = loads(Path(directory, "index.json").read_text())
         temp_modules = []
         for module_name, module_path in configuration.items():
@@ -30,5 +30,5 @@ class MLuaModulesManager(MLuaBase):
 
         return temp_modules
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{type(self).__name__}()"
