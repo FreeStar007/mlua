@@ -1,12 +1,10 @@
-from .base import *
-from .manager import *
+from .roots import *
+from .cores import *
 from .logs import *
 
-__version__ = "0.1.2"
-__author__ = "FreeStar007"
-
-def infos() -> None:
-    print(f"MLua version: {__version__}\nMLua author: {__author__}\nLicense: Apache 2.0")
+@MLuaLoggerDecorator.info("Checking status.")
+def status():
+    MLuaLoggerDisplayer.info("Normal.")
 
 def requirements() -> None:
     print("\n".join(["lupa", "colorama"]))
