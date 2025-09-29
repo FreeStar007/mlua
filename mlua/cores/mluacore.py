@@ -4,7 +4,7 @@ from typing import Set, Any
 
 from lupa import LuaRuntime, lua_type
 from pathlib import Path
-from ..base.mluaroot import MLuaBase
+from ..roots.mluaroot import MLuaBase
 
 class MLuaObject(MLuaBase):
 
