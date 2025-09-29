@@ -67,7 +67,7 @@ class MLuaModule(MLuaBase):
                 
         return mlua_object
 
-    def mount_deeply(self, environment: MLuaEnvironment, dependencies: "MLuaModuleDependencies", security=True) -> list[MLuaObject]:
+    def mount_deeply(self, environment: MLuaEnvironment, dependencies: "MLuaModulesDependencies", security=True) -> list[MLuaObject]:
         modules_installer = MLuaModulesInstaller(*dependencies.resolve(self))
         return modules_installer.mount_all(environment, security=security)
 
