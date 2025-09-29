@@ -3,7 +3,7 @@ __all__ = ["MLuaModulesManager"]
 from os import mkdir
 from pathlib import Path
 from json import loads, dumps
-from .mluacore import MLuaModule
+from .mluacores import MLuaModule
 from ..roots import MLuaBase
 
 class MLuaModulesManager(MLuaBase):

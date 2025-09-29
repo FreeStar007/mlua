@@ -1,2 +1,2 @@
-from .mluacore import *
-from .mluaenv import *
+from .mluacores import *
+from .mluaenvs import *

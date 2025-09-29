@@ -4,7 +4,7 @@ import colorama
 from datetime import datetime
 from time import time
 from pathlib import Path
-from ..roots.mluaroot import MLuaBase
+from ..roots.mluaroots import MLuaBase
 
 colorama.init(autoreset=True)
 
