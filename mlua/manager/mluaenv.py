@@ -1,10 +1,10 @@
+__all__ = ["MLuaModulesManager"]
+
 from os import mkdir
 from pathlib import Path
 from json import loads, dumps
 from .mluacore import MLuaModule
 from ..base import MLuaBase
-
-__all__ = ["MLuaModulesManager"]
 
 class MLuaModulesManager(MLuaBase):
 

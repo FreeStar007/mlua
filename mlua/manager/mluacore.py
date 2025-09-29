@@ -1,10 +1,10 @@
+__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaModulesInstaller", "MLuaModulesDependencies"]
+
 from typing import Set, Any
 
 from lupa import LuaRuntime, lua_type
 from pathlib import Path
 from ..base.mluaroot import MLuaBase
-
-__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaModulesInstaller", "MLuaModulesDependencies"]
 
 class MLuaObject(MLuaBase):
 
@@ -22,7 +22,7 @@ class MLuaObject(MLuaBase):
         def __str__(self) -> str:
             return self.__dict__.__str__()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{type(self).__name__}({self.functions.__str__()}, {self.values.__str__()})"
 
 # noinspection PyAttributeOutsideInit
@@ -37,7 +37,7 @@ class MLuaEnvironment(MLuaBase):
     def reset(self, *args, **kwargs) -> None:
         self._runtime = LuaRuntime(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{type(self).__name__}({self._runtime})"
 
 class MLuaModule(MLuaBase):
@@ -71,10 +71,10 @@ class MLuaModule(MLuaBase):
         modules_installer = MLuaModulesInstaller(*dependencies.resolve(self))
         return modules_installer.mount_all(environment, security=security)
 
-    def dependence(self, *modules: "MLuaModule"):
+    def dependence(self, *modules: "MLuaModule") -> None:
         self._dependencies[self._name].extend(modules)
         
-    def dependencies(self):
+    def dependencies(self) -> list["MLuaModule"]:
         return self._dependencies[self._name]
 
     def name(self) -> str:

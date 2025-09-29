@@ -1,10 +1,10 @@
+__all__ = ["MLuaLogger", "MLuaLoggerGenerator", "MLuaLoggerDisplayer", "MLuaLoggerDecorator"]
+
 import colorama
 from datetime import datetime
 from time import time
 from pathlib import Path
 from ..base.mluaroot import MLuaBase
-
-__all__ = ["MLuaLogger", "MLuaLoggerGenerator", "MLuaLoggerDisplayer", "MLuaLoggerDecorator"]
 
 colorama.init(autoreset=True)
 
@@ -16,32 +16,32 @@ class MLuaLogger(MLuaBase):
 class MLuaLoggerGenerator(MLuaLogger):
 
     @staticmethod
-    def info(message, datetime_enabled=True, bright_text=False):
+    def info(message: str, datetime_enabled=True, bright_text=False) -> str:
         return f"{colorama.Style.BRIGHT if bright_text else ""}{colorama.Fore.GREEN}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S ') if datetime_enabled else ""}INFO] {message}"
 
     @staticmethod
-    def warn(message, datetime_enabled=True, bright_text=False):
+    def warn(message: str, datetime_enabled=True, bright_text=False) -> str:
         return f"{colorama.Style.BRIGHT if bright_text else ""}{colorama.Fore.YELLOW}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S ') if datetime_enabled else ""}WARN] {message}"
 
     @staticmethod
-    def error(message, datetime_enabled=True, bright_text=False):
+    def error(message: str, datetime_enabled=True, bright_text=False) -> str:
         return f"{colorama.Style.BRIGHT if bright_text else ""}{colorama.Fore.RED}[{datetime.now().strftime('%Y-%m-%d %H:%M:%S ') if datetime_enabled else ""}ERROR] {message}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{type(self).__name__}()"
 
 class MLuaLoggerDisplayer(MLuaLogger):
 
     @staticmethod
-    def info(*args, **kwargs):
+    def info(*args, **kwargs) -> None:
         print(MLuaLoggerGenerator.info(*args, **kwargs))
 
     @staticmethod
-    def warn(*args, **kwargs):
+    def warn(*args, **kwargs) -> None:
         print(MLuaLoggerGenerator.warn(*args, **kwargs))
 
     @staticmethod
-    def error(*args, **kwargs):
+    def error(*args, **kwargs) -> None:
         print(MLuaLoggerGenerator.error(*args, **kwargs))
 
     def __str__(self):
@@ -50,9 +50,9 @@ class MLuaLoggerDisplayer(MLuaLogger):
 class MLuaLoggerDecorator(MLuaLogger):
 
     @staticmethod
-    def info(message):
-        def temp(function):
-            def run(*args, **kwargs):
+    def info(message: str) -> callable:
+        def temp(function) -> callable:
+            def run(*args, **kwargs) -> any:
                 MLuaLoggerDisplayer.info(message)
                 return function(*args, **kwargs)
                 
@@ -61,9 +61,9 @@ class MLuaLoggerDecorator(MLuaLogger):
         return temp
 
     @staticmethod
-    def warn(message):
-        def temp(function):
-            def run(*args, **kwargs):
+    def warn(message: str) -> callable:
+        def temp(function) -> callable:
+            def run(*args, **kwargs) -> any:
                 MLuaLoggerDisplayer.warn(message)
                 return function(*args, **kwargs)
 
@@ -72,9 +72,9 @@ class MLuaLoggerDecorator(MLuaLogger):
         return temp
 
     @staticmethod
-    def error(message):
-        def temp(function):
-            def run(*args, **kwargs):
+    def error(message: str) -> callable:
+        def temp(function) -> callable:
+            def run(*args, **kwargs) -> any:
                 MLuaLoggerDisplayer.error(message)
                 return function(*args, **kwargs)
 
@@ -83,9 +83,9 @@ class MLuaLoggerDecorator(MLuaLogger):
         return temp
 
     @staticmethod
-    def timer(ms=True):
-        def temp(function):
-            def run(*args, **kwargs):
+    def timer(ms=True) -> callable:
+        def temp(function) -> callable:
+            def run(*args, **kwargs) -> any:
                 start_time = time()
                 result = function(*args, **kwargs)
                 end_time = time() - start_time
@@ -96,32 +96,32 @@ class MLuaLoggerDecorator(MLuaLogger):
 
         return temp
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{type(self).__name__}()"
 
 class MLuaLoggerRecorder(MLuaLogger):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logs = []
 
-    def info(self, message):
+    def info(self, message: str) -> None:
         self.logs.append(MLuaLoggerGenerator.info(message))
 
-    def warn(self, message):
+    def warn(self, message: str) -> None:
         self.logs.append(MLuaLoggerGenerator.warn(message))
 
-    def error(self, message):
+    def error(self, message: str) -> None:
         self.logs.append(MLuaLoggerGenerator.error(message))
 
-    def display(self):
+    def display(self) -> None:
         for log in self.logs:
             print(log)
 
-    def save(self, file_path="mlua_logs.txt"):
-        Path(file_path).write_text("\n".join(self.logs))
+    def save(self, path="./mlua_logs.txt") -> None:
+        Path(path).write_text("\n".join(self.logs))
 
-    def load(self, file_path="mlua_logs.txt"):
-        self.logs = Path(file_path).read_text().split("\n")
+    def load(self, path="./mlua_logs.txt") -> None:
+        self.logs = Path(path).read_text().split("\n")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"MLuaLoggerRecorder({self.logs})"
