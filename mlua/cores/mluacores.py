@@ -13,17 +13,16 @@ class MLuaObject(MLuaBase):
     class _Functions:
 
         def __str__(self) -> str:
-            return self.__dict__.__str__()
+            return str(self.__dict__)
 
     class _Values:
 
         def __str__(self) -> str:
-            return self.__dict__.__str__()
+            return str(self.__dict__)
 
     def __str__(self) -> str:
         return f"{type(self).__name__}({self.functions.__str__()}, {self.values.__str__()})"
 
-# noinspection PyAttributeOutsideInit
 class MLuaEnvironment(MLuaBase):
 
     def __init__(self, *args, **kwargs) -> None:
@@ -116,7 +115,7 @@ class MLuaModulesDependencies(MLuaBase):
         def run(*son_dependencies: MLuaModule) -> None:
             for son_dependency in son_dependencies:
                 dependencies: list[MLuaModule] = son_dependency.dependencies()
-                if dependencies:
+                if dependencies is not None:
                     run(*dependencies)
                     
                 self._temp_results.append(son_dependency)
