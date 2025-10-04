@@ -124,6 +124,3 @@ class MLuaModulesDependencies(MLuaBase):
         result = self._temp_results
         self._temp_results = []
         return result
-
-    def __str__(self) -> str:
-        return f"{type(self).__name__}({', '.join([str(mlua_module) for mlua_module in self._temp_results])})"
