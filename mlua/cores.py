@@ -1,4 +1,4 @@
-__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaInstaller", "MLuaResolver", "MLuaInjector"]
+__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaManager", "MLuaResolver", "MLuaInjector"]
 
 from pathlib import Path
 from typing import Any
@@ -64,8 +64,7 @@ class MLuaModule(MLuaBase):
         return mlua_object
 
     def mount_deeply(self, environment: MLuaEnvironment, security=True) -> list[MLuaObject]:
-        installer = MLuaInstaller(*environment.resolver.requirements(self))
-        return installer.mount_all(environment, security=security)
+        return LuaManager(*environment.resolver.requirements(self)).mount_all(environment, security=security)
 
     def require(self, *modules: "MLuaModule") -> None:
         for module in modules:
@@ -104,20 +103,16 @@ class MLuaModule(MLuaBase):
         return f"{type(self).__name__}({self.name})"
 
 
-class MLuaInstaller(MLuaBase):
+class MLuaManager(MLuaBase):
 
     def __init__(self, *modules: MLuaModule) -> None:
         self._modules = modules
 
-    def mount_all(self, environment: MLuaEnvironment, security=True) -> list[MLuaObject]:
-        temp_modules = []
-        for module in self._modules:
-            temp_modules.append(module.mount(environment, security=security))
-
-        return temp_modules
+    def mount_all(self, environment: MLuaEnvironment, security=True) -> dict[str, MLuaObject]:
+            return {module.name: module.mount(environment, security=security) for module in self._modules}
 
     def __str__(self) -> str:
-        return f"{type(self).__name__}({', '.join([str(module) for module in self._modules])})"
+        return f"{type(self).__name__}({[str(module) for module in self._modules]})"
 
 
 class MLuaResolver(MLuaBase):

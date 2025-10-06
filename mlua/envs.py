@@ -1,4 +1,4 @@
-__all__ = ["MLuaManager", "MLuaPackager"]
+__all__ = ["MLuaOperator", "MLuaPackager"]
 
 from json import loads as jloads, dumps as jdumps
 from os import mkdir
@@ -12,7 +12,7 @@ from .errors import MLuaModuleError
 from .roots import MLuaBase
 
 
-class MLuaManager(MLuaBase):
+class MLuaOperator(MLuaBase):
 
     @staticmethod
     def save(*modules: MLuaModule, directory="./mlua_modules") -> bool:
