@@ -77,11 +77,3 @@ class MLuaPackager(MLuaBase):
 
         except TypeError:
             return False
-
-
-class MLuaPlugin(MLuaBase):
-
-    @classmethod
-    def mlua_plugin(cls, function: callable) -> callable:
-        def run(*args, **kwargs) -> None:
-            results: Any = function(*args, **kwargs)

@@ -1,3 +1,5 @@
+from mlua.mlua import MLuaManagerfrom mlua.mlua.envs import MLuaPackager
+
 # MLua 使用指南
 
 ## 概述
@@ -22,12 +24,16 @@ from mlua import MLuaModule, MLuaInstaller
 
 # 加载单个 Lua 模块
 module = MLuaModule("path/to/module.lua")
-# 挂载模块到环境
-mlua_obj = module.mount(lua_env: MLuaEnvironment)
 
-# 加载多个 Lua 模块
-installer = MLuaInstaller("path/to/module1.lua", "path/to/module2.lua")
-mlua_objects = installer.mount_all(lua_env: MLuaEnvironment)
+# 挂载模块到环境，指定secure=True以选择安全模式，默认选择
+mlua_obj = module.mount(lua_env: MLuaEnvironment, [secure=True])
+
+# 加载模块及其依赖
+mlua_objects = module.mount_deeply(lua_env: MLuaEnvironment, [secure=True])
+
+# 加载多个 Lua 模块，返回一个mlua_objects列表
+installer = MLuaInstaller(mlua_module1: MLuaModule, mlua_module2: MLuaModule, ...)
+mlua_objects = installer.mount_all(lua_env: MLuaEnvironment, [secure=True])
 ```
 
 ### 3. 使用模块功能
@@ -58,9 +64,7 @@ modules_to_load = MLuaResolver.requirements_directly(module: MLuaModule)
 MLuaResolver.relationship(modules_to_load1, modules_to_load2, modules_to_load3, ...)
 ```
 
-## 高级用法
-
-### 日志
+### 5.日志
 
 ```python
 from mlua import MLuaLogsPrinter
@@ -75,20 +79,27 @@ MLuaLogsPrinter.warn("Something might be wrong!")
 MLuaLogsPrinter.error("Something went wrong!")
 ```
 
-### 安全模式
+### 6.打包
 
 ```python
-# 安全模式挂载（推荐）
-mlua_obj = module.mount(lua_env: MLuaEnvironment, security = True)
-# 非安全模式挂载（更快但可能不安全）
-mlua_obj = module.mount(lua_env: MLuaEnvironment, security = False)
+# 打包模块，返回字节串
+results_bytes = MLuaPackager.pack(module1: MLuaModule, module2: MLuaModule, ...)
+
+# 解包模块，返回模块列表
+results_modules = MLuaPackager.unpack(data_bytes: bytes)
 ```
 
-### 深度加载模块
+### 7.保存至文件
 
 ```python
-# 深度加载模块及其所有依赖
-mlua_objects = module.mount_deeply(lua_env: MLuaEnvironment)
+# 保存模块至文件，默认仓库目录为./mlua_modules
+MLuaManager.save(module1: MLuaModule, module2: MLuaModule, ..., [directory="./mlua_modules"])
+
+# 加载模块文件，返回模块列表
+results_modules = MLuaManager.load([directory="./mlua_modules"])
+
+# 直接使用指定模块
+results_modules = MLuaManager.use("module1", "module2", ..., [directory="./mlua_modules"])
 ```
 
 ### 校验状态
@@ -104,4 +115,3 @@ status()
 1. 建议始终使用安全模式挂载模块
 2. 模块依赖关系应避免循环依赖
 3. 模块文件路径应为绝对路径或相对于工作目录的有效路径
-4. 禁止循环依赖
