@@ -1,4 +1,4 @@
-__all__ = ["MLuaManager"]
+__all__ = ["MLuaManager", "MLuaPackager"]
 
 from json import loads as jloads, dumps as jdumps
 from os import mkdir
