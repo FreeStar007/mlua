@@ -1,0 +1,18 @@
+# 排除Python编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 排除虚拟环境
+venv/
+env/
+.venv/
+ENV/
+
+# 排除Python依赖生成文件
+build/
+dist/
+*.egg-info/
+
+# 排除环境变量文件
+.env
