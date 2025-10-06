@@ -54,26 +54,8 @@ class MLuaPackager(MLuaBase):
 
     @staticmethod
     def pack(*modules: MLuaModule) -> bytes:
-        structure = {}
-        for module in modules:
-            structure[module.path] = module.source
-
-        return compress(pdumps(structure))
+        return compress(pdumps({module.name: module for module in modules}))
 
     @staticmethod
-    def unpack(data: bytes) -> list[MLuaModule]:
-        structure = ploads(decompress(data))
-        temp_modules = []
-        for path, source in structure.items():
-            temp_modules.append(MLuaModule(path))
-
-        return temp_modules
-
-    @staticmethod
-    def test(data: bytes) -> bool:
-        try:
-            ploads(decompress(data))
-            return True
-
-        except TypeError:
-            return False
+    def unpack(data: bytes) -> dict[str, MLuaModule]:
+        return ploads(decompress(data))
