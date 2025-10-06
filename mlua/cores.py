@@ -170,13 +170,13 @@ class MLuaInjector(MLuaBase):
         lua_module = module.mount(environment, security=security)
         functions = lua_module.functions
         values = lua_module.values
-        for function_name, function_value in functions.__dict__.items():
-            if not function_name.startswith("__"):
-                globals_dict[function_name] = function_value
+        for name, value in functions.__dict__.items():
+            if not name.startswith("__"):
+                globals_dict[name] = value
 
-        for value_name, value_value in values.__dict__.items():
-            if not value_name.startswith("__"):
-                globals_dict[value_name] = value_value
+        for name, value in values.__dict__.items():
+            if not name.startswith("__"):
+                globals_dict[name] = value
 
     @staticmethod
     def inject_deeply(environment: MLuaEnvironment, module: MLuaModule, globals_dict, security=True) -> None:
