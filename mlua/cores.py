@@ -40,20 +40,19 @@ class MLuaModule(MLuaBase):
         mlua_object = MLuaObject()
         functions = mlua_object.functions
         values = mlua_object.values
-        lua: LuaRuntime = environment.lua_runtime
-        temp_modules: dict = lua.execute(self._data)
+        modules: dict = environment.lua_runtime.execute(self._data)
         """
         两段循环意图为去除循环内判断的开销，遇到模块数据大的情况时有显著用处
-        setattr有内置函数处理安全方面
+        setattr会处理部分边缘情况
         __dict__访问更快
         模块量少的情况下建议选择第一种方式，即security不需要改动
         """
         if security:
-            for key, value in temp_modules.items():
+            for key, value in modules.items():
                 setattr(functions if lua_type(value) == "function" else values, key, value)
 
         else:
-            for key, value in temp_modules.items():
+            for key, value in modules.items():
                 (functions if lua_type(value) == "function" else values).__dict__[key] = value
 
         return mlua_object
@@ -61,18 +60,11 @@ class MLuaModule(MLuaBase):
     def mount_deeply(self, environment: MLuaEnvironment, security=True) -> dict[str, MLuaObject]:
         return MLuaManager(*MLuaResolver.requirements(self)).mount_all(environment, security=security)
 
-    def inject(self, environment: MLuaEnvironment, globals_dict: dict[Any, Any], security=True) -> None:
-        mlua_object = self.mount(environment, security=security)
-        functions = mlua_object.functions
-        values = mlua_object.values
-        for name, value in functions.__dict__.items():
-            globals_dict[name] = value
+    def inject(self, environment: MLuaEnvironment, globals_dict: dict[Any, Any]) -> None:
+        globals_dict.update({key: value for key, value in environment.lua_runtime.execute(self._data).items()})
 
-        for name, value in values.__dict__.items():
-            globals_dict[name] = value
-
-    def inject_deeply(self, environment: MLuaEnvironment, globals_dict, security=True) -> None:
-        return MLuaManager(*MLuaResolver.requirements(self)).inject_all(environment, globals_dict, security=security)
+    def inject_deeply(self, environment: MLuaEnvironment, globals_dict) -> None:
+        return MLuaManager(*MLuaResolver.requirements(self)).inject_all(environment, globals_dict)
 
     def require(self, *modules: Self) -> None:
         for module in modules:
@@ -121,7 +113,7 @@ class MLuaManager(MLuaBase):
 
     def inject_all(self, environment: MLuaEnvironment, globals_dict: dict[Any, Any], security=True) -> None:
         for module in self._modules:
-            module.inject(environment, globals_dict, security=security)
+            module.inject(environment, globals_dict)
 
     def __str__(self) -> str:
         return f"{type(self).__name__}({[str(module) for module in self._modules]})"

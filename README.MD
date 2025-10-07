@@ -30,17 +30,17 @@ mlua_obj = module.mount(lua_env: MLuaEnvironment, [secure = True])
 mlua_objects = module.mount_deeply(lua_env: MLuaEnvironment, [security=True])
 
 # 注入模块到全局环境，指定globals_dict以指定全局环境，直接传入globals()以注入当前全局环境
-module.inject(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any], [security=True])
+module.inject(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any])
 
 # 加载模块及其依赖，并注入到全局环境
-module.inject_deeply(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any], [security=True])
+module.inject_deeply(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any])
 
 # 加载多个 Lua 模块，返回一个mlua_objects列表
 manager = MLuaManager(module1: MLuaModule, module2: MLuaModule, ...)
 mlua_objects = manager.mount_all(lua_env: MLuaEnvironment, [secure = True])
 
 # 注入多个模块到全局环境
-manager.inject_all(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any], [security=True])
+manager.inject_all(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any])
 ```
 
 ### 3. 使用模块功能
