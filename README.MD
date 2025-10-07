@@ -88,14 +88,6 @@ results_modules = MLuaManager.load([directory = "./mlua_modules"])
 results_modules = MLuaManager.use("module1", "module2", ..., [directory = "./mlua_modules"])
 ```
 
-### 校验状态
-
-```python
-from mlua import status
-
-status()
-```
-
 ## 注意事项
 
 1. 建议始终使用安全模式挂载模块
