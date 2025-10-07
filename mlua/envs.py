@@ -1,5 +1,3 @@
-__all__ = ["MLuaOperator", "MLuaPackager"]
-
 from json import loads as jloads, dumps as jdumps
 from os import mkdir
 from pathlib import Path
@@ -9,6 +7,8 @@ from zlib import compress, decompress
 from .cores import MLuaModule
 from .errors import MLuaModuleError
 from .roots import MLuaBase
+
+__all__ = ["MLuaOperator", "MLuaPackager"]
 
 
 class MLuaOperator(MLuaBase):

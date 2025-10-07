@@ -65,22 +65,7 @@ modules_to_load = MLuaResolver.requirements(module1: MLuaModule, module2: MLuaMo
 MLuaResolver.relationship(module1: MLuaModule, module2: MLuaModule, ...)
 ```
 
-### 5.日志
-
-```python
-from mlua import MLuaLogsPrinter
-
-# 打印信息日志
-MLuaLogsPrinter.info("Hello, world!")
-
-# 打印警告日志
-MLuaLogsPrinter.warn("Something might be wrong!")
-
-# 打印错误日志
-MLuaLogsPrinter.error("Something went wrong!")
-```
-
-### 6.打包
+### 5.打包
 
 ```python
 # 打包模块，返回字节串
@@ -90,7 +75,7 @@ results_bytes = MLuaPackager.pack(module1: MLuaModule, module2: MLuaModule, ...)
 results_modules = MLuaPackager.unpack(data_bytes: bytes)
 ```
 
-### 7.保存至文件
+### 6.保存
 
 ```python
 # 保存模块至文件，默认仓库目录为./mlua_modules

@@ -1,5 +1,3 @@
-__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaManager", "MLuaResolver"]
-
 from pathlib import Path
 from typing import Any, Self
 
@@ -7,6 +5,8 @@ from lupa import LuaRuntime, lua_type
 
 from .errors import MLuaModuleError
 from .roots import MLuaBase, MLuaObject
+
+__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaManager", "MLuaResolver"]
 
 
 class MLuaEnvironment(MLuaBase):
