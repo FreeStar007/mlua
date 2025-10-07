@@ -133,18 +133,17 @@ class MLuaResolver(MLuaBase):
 
     @staticmethod
     def requirements(*modules: MLuaModule) -> list[MLuaModule]:
-        temp_results = []
+        results = []
+
         def run(*son_requirements: MLuaModule) -> None:
             for son_requirement in son_requirements:
                 requirements: list[MLuaModule] = son_requirement.requirements
                 if requirements:
                     run(*requirements)
 
-                temp_results.append(son_requirement)
+                results.append(son_requirement)
 
         run(*modules)
-        results = temp_results
-        temp_results = []
         return results
 
     @staticmethod

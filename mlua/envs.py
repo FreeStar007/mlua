@@ -4,7 +4,6 @@ from json import loads as jloads, dumps as jdumps
 from os import mkdir
 from pathlib import Path
 from pickle import dumps as pdumps, loads as ploads
-from typing import Any
 from zlib import compress, decompress
 
 from .cores import MLuaModule

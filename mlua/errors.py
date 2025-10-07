@@ -5,7 +5,7 @@ class MLuaError(Exception, MLuaBase):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        
+
 
 class MLuaModuleError(MLuaError):
 

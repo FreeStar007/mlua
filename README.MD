@@ -26,14 +26,14 @@ from mlua import MLuaModule, MLuaInstaller
 module = MLuaModule("path/to/module.lua")
 
 # 挂载模块到环境，指定secure=True以选择安全模式，默认选择
-mlua_obj = module.mount(lua_env: MLuaEnvironment, [secure=True])
+mlua_obj = module.mount(lua_env: MLuaEnvironment, [secure = True])
 
 # 加载模块及其依赖
-mlua_objects = module.mount_deeply(lua_env: MLuaEnvironment, [secure=True])
+mlua_objects = module.mount_deeply(lua_env: MLuaEnvironment, [secure = True])
 
 # 加载多个 Lua 模块，返回一个mlua_objects列表
-installer = MLuaInstaller(mlua_module1: MLuaModule, mlua_module2: MLuaModule, ...)
-mlua_objects = installer.mount_all(lua_env: MLuaEnvironment, [secure=True])
+installer = MLuaInstaller(module1: MLuaModule, module2: MLuaModule, ...)
+mlua_objects = installer.mount_all(lua_env: MLuaEnvironment, [secure = True])
 ```
 
 ### 3. 使用模块功能
@@ -51,17 +51,11 @@ value = mlua_obj.values.some_variable
 ```python
 from mlua import MLuaResolver
 
-# 创建依赖管理器
-resolver = MLuaResolver()
-
-# 解析模块依赖（解析对象式）
-modules_to_load = resolver.requirements(module: MLuaModule)
-
-# 解析模块依赖（解析全局式）
-modules_to_load = MLuaResolver.requirements_directly(module: MLuaModule)
+# 解析模块依赖
+modules_to_load = MLuaResolver.requirements(module1: MLuaModule, module2: MLuaModule, ...)
 
 # 打印依赖关系
-MLuaResolver.relationship(modules_to_load1, modules_to_load2, modules_to_load3, ...)
+MLuaResolver.relationship(module1: MLuaModule, module2: MLuaModule, ...)
 ```
 
 ### 5.日志
@@ -93,13 +87,13 @@ results_modules = MLuaPackager.unpack(data_bytes: bytes)
 
 ```python
 # 保存模块至文件，默认仓库目录为./mlua_modules
-MLuaManager.save(module1: MLuaModule, module2: MLuaModule, ..., [directory="./mlua_modules"])
+MLuaManager.save(module1: MLuaModule, module2: MLuaModule, ..., [directory = "./mlua_modules"])
 
 # 加载模块文件，返回模块列表
-results_modules = MLuaManager.load([directory="./mlua_modules"])
+results_modules = MLuaManager.load([directory = "./mlua_modules"])
 
 # 直接使用指定模块
-results_modules = MLuaManager.use("module1", "module2", ..., [directory="./mlua_modules"])
+results_modules = MLuaManager.use("module1", "module2", ..., [directory = "./mlua_modules"])
 ```
 
 ### 校验状态
