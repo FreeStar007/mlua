@@ -1,7 +1,7 @@
-__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaManager", "MLuaResolver", "MLuaInjector"]
+__all__ = ["MLuaObject", "MLuaEnvironment", "MLuaModule", "MLuaManager", "MLuaResolver"]
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 from lupa import LuaRuntime, lua_type
 
@@ -14,15 +14,10 @@ class MLuaEnvironment(MLuaBase):
     def __init__(self, *args, **kwargs) -> None:
         self._runtime: LuaRuntime = None
         self.reset(*args, **kwargs)
-        self._resolver = MLuaResolver()
 
     @property
     def lua_runtime(self) -> LuaRuntime:
         return self._runtime
-
-    @property
-    def resolver(self) -> "MLuaResolver":
-        return self._resolver
 
     def reset(self, *args, **kwargs) -> None:
         self._runtime = LuaRuntime(*args, **kwargs)
@@ -63,20 +58,35 @@ class MLuaModule(MLuaBase):
 
         return mlua_object
 
-    def mount_deeply(self, environment: MLuaEnvironment, security=True) -> list[MLuaObject]:
-        return LuaManager(*environment.resolver.requirements(self)).mount_all(environment, security=security)
+    def mount_deeply(self, environment: MLuaEnvironment, security=True) -> dict[str, MLuaObject]:
+        return MLuaManager(*MLuaResolver.requirements(self)).mount_all(environment, security=security)
 
-    def require(self, *modules: "MLuaModule") -> None:
+    def inject(self, environment: MLuaEnvironment, globals_dict: dict[Any, Any], security=True) -> None:
+        mlua_object = self.mount(environment, security=security)
+        functions = mlua_object.functions
+        values = mlua_object.values
+        for name, value in functions.__dict__.items():
+            if not name.startswith("__"):
+                globals_dict[name] = value
+
+        for name, value in values.__dict__.items():
+            if not name.startswith("__"):
+                globals_dict[name] = value
+
+    def inject_deeply(self, environment: MLuaEnvironment, globals_dict, security=True) -> None:
+        return MLuaManager(*MLuaResolver.requirements(self)).inject_all(environment, globals_dict, security=security)
+
+    def require(self, *modules: Self) -> None:
         for module in modules:
             if module in self._requirements[self._name]:
                 raise MLuaModuleError(f"module \"{module.name}\" has already been included in \"{self._name}\"")
 
-            elif self in MLuaResolver.requirements_directly(module):
+            elif self in MLuaResolver.requirements(module):
                 raise MLuaModuleError(f"module \"{module.name}\" has already required module \"{self._name}\"")
 
         self._requirements[self._name].extend(modules)
 
-    def require_not(self, *modules: "MLuaModule") -> None:
+    def require_not(self, *modules: Self) -> None:
         for index, module in enumerate(modules):
             if not module in self._requirements[self._name]:
                 raise MLuaModuleError(f"module \"{module.name}\" has not been included in \"{self._name}\"")
@@ -84,7 +94,7 @@ class MLuaModule(MLuaBase):
             del self._requirements[self._name][index]
 
     @property
-    def requirements(self) -> list["MLuaModule"]:
+    def requirements(self) -> list[Self]:
         return self._requirements[self._name]
 
     @property
@@ -109,45 +119,32 @@ class MLuaManager(MLuaBase):
         self._modules = modules
 
     def mount_all(self, environment: MLuaEnvironment, security=True) -> dict[str, MLuaObject]:
-            return {module.name: module.mount(environment, security=security) for module in self._modules}
+        return {module.name: module.mount(environment, security=security) for module in self._modules}
+
+    def inject_all(self, environment: MLuaEnvironment, globals_dict: dict[Any, Any], security=True) -> None:
+        for module in self._modules:
+            module.inject(environment, globals_dict, security=security)
 
     def __str__(self) -> str:
         return f"{type(self).__name__}({[str(module) for module in self._modules]})"
 
 
 class MLuaResolver(MLuaBase):
-    _global_results = []
 
-    def __init__(self) -> None:
-        self._temp_results = []
-
-    def requirements(self, *modules: MLuaModule) -> list[MLuaModule]:
+    @staticmethod
+    def requirements(*modules: MLuaModule) -> list[MLuaModule]:
+        temp_results = []
         def run(*son_requirements: MLuaModule) -> None:
             for son_requirement in son_requirements:
                 requirements: list[MLuaModule] = son_requirement.requirements
                 if requirements:
                     run(*requirements)
 
-                self._temp_results.append(son_requirement)
+                temp_results.append(son_requirement)
 
         run(*modules)
-        results = self._temp_results
-        self._temp_results = []
-        return results
-
-    @classmethod
-    def requirements_directly(cls, *modules: MLuaModule) -> list[MLuaModule]:
-        def run(*son_requirements: MLuaModule) -> None:
-            for son_requirement in son_requirements:
-                requirements: list[MLuaModule] = son_requirement.requirements
-                if requirements:
-                    run(*requirements)
-
-                cls._global_results.append(son_requirement)
-
-        run(*modules)
-        results = cls._global_results
-        cls._global_results = []
+        results = temp_results
+        temp_results = []
         return results
 
     @staticmethod
@@ -160,27 +157,3 @@ class MLuaResolver(MLuaBase):
                     run(indent + indent_length, *requirements)
 
         run(0, *modules)
-
-
-# 谨慎使用，避免命名空间污染
-class MLuaInjector(MLuaBase):
-
-    @staticmethod
-    def inject(environment: MLuaEnvironment, module: MLuaModule, globals_dict: dict[Any, Any], security=True) -> None:
-        lua_module = module.mount(environment, security=security)
-        functions = lua_module.functions
-        values = lua_module.values
-        for name, value in functions.__dict__.items():
-            if not name.startswith("__"):
-                globals_dict[name] = value
-
-        for name, value in values.__dict__.items():
-            if not name.startswith("__"):
-                globals_dict[name] = value
-
-    @staticmethod
-    def inject_deeply(environment: MLuaEnvironment, module: MLuaModule, globals_dict, security=True) -> None:
-        for requirement in module.requirements:
-            MLuaInjector.inject_deeply(environment, requirement, globals_dict, security=security)
-
-        MLuaInjector.inject(environment, module, globals_dict, security=security)
