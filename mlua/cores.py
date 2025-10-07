@@ -66,12 +66,10 @@ class MLuaModule(MLuaBase):
         functions = mlua_object.functions
         values = mlua_object.values
         for name, value in functions.__dict__.items():
-            if not name.startswith("__"):
-                globals_dict[name] = value
+            globals_dict[name] = value
 
         for name, value in values.__dict__.items():
-            if not name.startswith("__"):
-                globals_dict[name] = value
+            globals_dict[name] = value
 
     def inject_deeply(self, environment: MLuaEnvironment, globals_dict, security=True) -> None:
         return MLuaManager(*MLuaResolver.requirements(self)).inject_all(environment, globals_dict, security=security)
