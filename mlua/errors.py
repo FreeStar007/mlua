@@ -1,6 +1,6 @@
 from .roots import MLuaBase
 
-__all__ = ["MLuaError", "MLuaModuleError", "MLuaRuntimeError"]
+__all__ = ("MLuaError", "MLuaModuleError", "MLuaRuntimeError")
 
 
 class MLuaError(Exception, MLuaBase):

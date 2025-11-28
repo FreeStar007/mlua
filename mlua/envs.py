@@ -8,7 +8,7 @@ from .cores import MLuaModule
 from .errors import MLuaModuleError
 from .roots import MLuaBase
 
-__all__ = ["MLuaOperator", "MLuaPackager"]
+__all__ = ("MLuaOperator", "MLuaPackager")
 
 
 class MLuaOperator(MLuaBase):

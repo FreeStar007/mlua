@@ -1,4 +1,4 @@
-__all__ = ["MLuaBase", "MLuaObject"]
+__all__ = ("MLuaBase", "MLuaObject")
 
 
 class MLuaBase:
