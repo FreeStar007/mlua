@@ -24,7 +24,7 @@ from mlua import MLuaModule, MLuaManager
 module = MLuaModule("path/to/module.lua")
 
 # 挂载模块到环境，指定secure=True以选择安全模式，默认选择
-mlua_obj = module.mount(lua_env: MLuaEnvironment, [secure = True])
+mlua_obj = module.mount(lua_env: MLuaEnvironment, [security=True])
 
 # 加载模块及其依赖
 mlua_objects = module.mount_deeply(lua_env: MLuaEnvironment, [security=True])
@@ -37,7 +37,7 @@ module.inject_deeply(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any])
 
 # 加载多个 Lua 模块，返回一个mlua_objects列表
 manager = MLuaManager(module1: MLuaModule, module2: MLuaModule, ...)
-mlua_objects = manager.mount_all(lua_env: MLuaEnvironment, [secure = True])
+mlua_objects = manager.mount_all(lua_env: MLuaEnvironment, [security=True])
 
 # 注入多个模块到全局环境
 manager.inject_all(lua_env: MLuaEnvironment, globals_dict: dict[Any, Any])
@@ -79,13 +79,13 @@ results_modules = MLuaPackager.unpack(data_bytes: bytes)
 
 ```python
 # 保存模块至文件，默认仓库目录为./mlua_modules
-MLuaManager.save(module1: MLuaModule, module2: MLuaModule, ..., [directory = "./mlua_modules"])
+MLuaManager.save(module1: MLuaModule, module2: MLuaModule, ..., [directory="./mlua_modules"])
 
 # 加载模块文件，返回模块列表
-results_modules = MLuaManager.load([directory = "./mlua_modules"])
+results_modules = MLuaManager.load([directory="./mlua_modules"])
 
 # 直接使用指定模块
-results_modules = MLuaManager.use("module1", "module2", ..., [directory = "./mlua_modules"])
+results_modules = MLuaManager.use("module1", "module2", ..., [directory="./mlua_modules"])
 ```
 
 ## 注意事项
